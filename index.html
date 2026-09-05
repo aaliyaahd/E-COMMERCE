@@ -8,14 +8,8 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- File Custom CSS -->
-  <link rel="stylesheet" href="style.css">
-  
-  <!-- Chart.js CDN (Versi UMD stabil agar grafik pasti ter-render) -->
+  <!-- Chart.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-
-  <!-- JavaScript Utama (Menggunakan defer agar berjalan saat DOM siap) -->
-  <script src="app.js?v=2" defer></script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans p-6">
 
@@ -27,7 +21,6 @@
         <h1 class="text-2xl font-bold text-gray-900">E-Commerce Performance</h1>
         <p class="text-sm text-gray-500">Ringkasan penjualan dan transaksi terbaru</p>
       </div>
-      <!-- Filter Sederhana -->
       <select id="timeRange" class="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
         <option value="6m">6 Bulan Terakhir</option>
         <option value="1y">1 Tahun</option>
@@ -60,15 +53,12 @@
 
     <!-- Charts Section -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Line Chart (Revenue Trend) -->
       <div class="lg:col-span-2 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
         <h3 class="text-lg font-bold text-gray-800 mb-4">Tren Pendapatan vs Profit</h3>
         <div class="relative w-full h-[300px]">
           <canvas id="revenueChart"></canvas>
         </div>
       </div>
-
-      <!-- Donut Chart (Category) -->
       <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
         <h3 class="text-lg font-bold text-gray-800 mb-4">Penjualan per Kategori</h3>
         <div class="relative w-full h-[300px] flex justify-center items-center">
@@ -81,7 +71,6 @@
     <section class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-bold text-gray-800">Transaksi Terbaru</h3>
-        <!-- Search Input -->
         <input type="text" id="searchInput" placeholder="Cari nama pelanggan..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
       </div>
       <div class="overflow-x-auto">
@@ -96,13 +85,86 @@
             </tr>
           </thead>
           <tbody id="transactionTable" class="text-sm divide-y divide-gray-100">
-            <!-- Data baris tabel diisi dari JavaScript -->
+            <!-- Isi tabel dari JS -->
           </tbody>
         </table>
       </div>
     </section>
-
   </div>
 
+  <!-- SCRIPT DIGABUNG DI SINI AGAR PASTI JALAN -->
+  <script>
+    // 1. Isi Data KPI
+    document.getElementById('totalRevenue').innerText = 'Rp 45.000.000';
+    document.getElementById('totalOrders').innerText = '320';
+    document.getElementById('avgOrderValue').innerText = 'Rp 140.625';
+    document.getElementById('conversionRate').innerText = '3.8%';
+
+    // 2. Chart Garis
+    const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctxRevenue, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+        datasets: [{
+          label: 'Pendapatan (Rp)',
+          data: [12000000, 19000000, 15000000, 25000000, 22000000, 30000000],
+          borderColor: '#4f46e5',
+          backgroundColor: 'rgba(79, 70, 229, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // 3. Chart Donat
+    const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctxCategory, {
+      type: 'doughnut',
+      data: {
+        labels: ['Elektronik', 'Fashion', 'Makanan', 'Lainnya'],
+        datasets: [{
+          data: [45, 25, 20, 10],
+          backgroundColor: ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b'],
+          borderWidth: 0
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // 4. Tabel Transaksi
+    const transactions = [
+      { id: 'ORD-001', name: 'Budi Santoso', date: '05 Sep 2026', total: 'Rp 1.500.000', status: 'Selesai' },
+      { id: 'ORD-002', name: 'Siti Aminah', date: '04 Sep 2026', total: 'Rp 350.000', status: 'Diproses' },
+      { id: 'ORD-003', name: 'Andi Wijaya', date: '04 Sep 2026', total: 'Rp 2.100.000', status: 'Selesai' },
+      { id: 'ORD-004', name: 'Rina Melati', date: '03 Sep 2026', total: 'Rp 150.000', status: 'Dibatalkan' },
+      { id: 'ORD-005', name: 'Dimas Anggara', date: '02 Sep 2026', total: 'Rp 850.000', status: 'Diproses' }
+    ];
+
+    const tableBody = document.getElementById('transactionTable');
+    let tableHTML = '';
+
+    transactions.forEach(trx => {
+      let statusColor = '';
+      if (trx.status === 'Selesai') statusColor = 'text-green-700 bg-green-100';
+      else if (trx.status === 'Diproses') statusColor = 'text-yellow-700 bg-yellow-100';
+      else statusColor = 'text-red-700 bg-red-100';
+
+      tableHTML += `
+        <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+          <td class="py-3 px-4 text-gray-700">${trx.id}</td>
+          <td class="py-3 px-4 font-medium text-gray-900">${trx.name}</td>
+          <td class="py-3 px-4 text-gray-500">${trx.date}</td>
+          <td class="py-3 px-4 font-medium text-gray-700">${trx.total}</td>
+          <td class="py-3 px-4">
+            <span class="px-3 py-1 text-xs font-semibold rounded-full ${statusColor}">${trx.status}</span>
+          </td>
+        </tr>
+      `;
+    });
+    tableBody.innerHTML = tableHTML;
+  </script>
 </body>
 </html>
