@@ -11,8 +11,11 @@
   <!-- File Custom CSS -->
   <link rel="stylesheet" href="style.css">
   
-  <!-- Chart.js CDN (Menggunakan cdnjs agar lebih stabil) -->
+  <!-- Chart.js CDN (Versi UMD stabil agar grafik pasti ter-render) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+  <!-- JavaScript Utama (Menggunakan defer agar berjalan saat DOM siap) -->
+  <script src="app.js" defer></script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans p-6">
 
@@ -72,7 +75,7 @@
           <canvas id="categoryChart"></canvas>
         </div>
       </div>
-    </section> <!-- Tag penutup ini tadi terlewat -->
+    </section>
 
     <!-- Table Section -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
@@ -101,6 +104,5 @@
 
   </div>
 
-  <script src="app.js"></script>
 </body>
 </html>
